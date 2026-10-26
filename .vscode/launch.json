@@ -6,7 +6,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "externalTerminal",
+            "console": "internalConsole",
             "python": "${workspaceFolder}/.venv/Scripts/python.exe"
         }
     ]
