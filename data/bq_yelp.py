@@ -2,6 +2,7 @@ import logging
 from google.cloud import bigquery
 from google.cloud.exceptions import GoogleCloudError
 import config
+from contextlib import closing
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def fetch_raw_yelp_records():
 
     try:
         # Context manager guarantees session teardown
-        with bigquery.Client(project=config.BQ_PROJECT_ID) as bq_client:
+        with closing(bigquery.Client(project=config.BQ_PROJECT_ID)) as bq_client:
             logger.info("Executing BigQuery extraction query.")
             query_job = bq_client.query(query)
             results = query_job.result()
