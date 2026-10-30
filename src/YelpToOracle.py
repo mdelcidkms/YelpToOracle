@@ -9,7 +9,7 @@ from data.db_oracle import insert_customer_yelp_records
 # Create handlers
 console_handler = logging.StreamHandler()
 file_handler = RotatingFileHandler(
-    "yelp_to_oracle.log",   # log file name
+    "yelp_to_oracle.log",      # log file name
     maxBytes=5 * 1024 * 1024,  # 5 MB per file
     backupCount=5,             # keep 5 old files
     encoding="utf-8"
@@ -30,33 +30,41 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
 print("All dependencies imported successfully!!")
 print("Starting the Yelp to Oracle ETL process...")
 
+
 def main():
-    logger.info("Starting Yelp -> Oracle import flow.")
-
-    records = fetch_raw_yelp_records()
-    total_extracted = len(records)
-    logger.info("BigQuery extraction completed. Rows fetched: %d", total_extracted)
-    print(f"BigQuery rows fetched: {total_extracted}")
-
-    if total_extracted == 0:
-        logger.warning("No rows extracted from BigQuery. Import skipped.")
-        print("No rows returned from BigQuery. Nothing to insert.")
-        return
+    logger.info("Starting Yelp -> Oracle import.")
 
     try:
+        records = fetch_raw_yelp_records()
+        total_records = len(records)
+
+        logger.info("Source records returned: %d", total_records)
+
+        if not records:
+            logger.warning(
+                "No source records returned; Oracle import skipped. "
+                "Check extraction logs for any source errors."
+            )
+            return
+
         inserted_count = insert_customer_yelp_records(records)
+        skipped_count = total_records - inserted_count
+
         logger.info(
-            "CUSTOMER_YELP insert completed successfully. Rows inserted: %d",
+            "SUCCESS: CUSTOMER_YELP import committed. "
+            "Received: %d | Inserted: %d | Skipped (existing YELP_BID): %d",
+            total_records,
             inserted_count,
+            skipped_count,
         )
-        print(f"SUCCESS: Inserted {inserted_count} row(s) into CUSTOMER_YELP.")
-    except Exception as err:
-        logger.error("CUSTOMER_YELP import failed: %s", err, exc_info=True)
-        print("ERROR: Oracle import failed. Check logs for details.")
+
+    except Exception:
+        logger.exception("FAILED: Yelp -> Oracle import did not complete.")
+        raise
+
 
 if __name__ == "__main__":
     main()

@@ -10,35 +10,43 @@ logger = logging.getLogger(__name__)
 oracledb.init_oracle_client(lib_dir=r"C:\Oracle\instantclient_21_23")
 
 INSERT_CUSTOMER_YELP_SQL = """
-    INSERT INTO K2.CUSTOMER_YELP (
-        YELP_BID,
-        NAME,
-        ADDRESS,
-        CITY,
-        STATE,
-        ZIPCODE,
-        COUNTRY,
-        PHONENUMBER,
-        SITEURL,
-        VERIFIED_LATITUDE,
-        VERIFIED_LONGITUDE,
-        YELPLINK,
-        DESCRIPTION
-    ) VALUES (
-        :YELP_BID,
-        :NAME,
-        :ADDRESS,
-        :CITY,
-        :STATE,
-        :ZIPCODE,
-        :COUNTRY,
-        :PHONENUMBER,
-        :SITEURL,
-        :VERIFIED_LATITUDE,
-        :VERIFIED_LONGITUDE,
-        :YELPLINK,
-        :DESCRIPTION
-    )
+    MERGE INTO K2.CUSTOMER_YELP target
+    USING (
+        SELECT :YELP_BID AS YELP_BID
+        FROM dual
+    ) source
+    ON (target.YELP_BID = source.YELP_BID)
+    WHEN NOT MATCHED THEN
+        INSERT (
+            YELP_BID,
+            NAME,
+            ADDRESS,
+            CITY,
+            STATE,
+            ZIPCODE,
+            COUNTRY,
+            PHONENUMBER,
+            SITEURL,
+            VERIFIED_LATITUDE,
+            VERIFIED_LONGITUDE,
+            YELPLINK,
+            DESCRIPTION
+        )
+        VALUES (
+            source.YELP_BID,
+            :NAME,
+            :ADDRESS,
+            :CITY,
+            :STATE,
+            :ZIPCODE,
+            :COUNTRY,
+            :PHONENUMBER,
+            :SITEURL,
+            :VERIFIED_LATITUDE,
+            :VERIFIED_LONGITUDE,
+            :YELPLINK,
+            :DESCRIPTION
+        )
 """
 
 
