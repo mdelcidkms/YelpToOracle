@@ -19,6 +19,6 @@ SMARTY_AUTH_TOKEN = "your-smarty-auth-token"
 # ==============================================================================
 # Oracle Database Connection (python-oracledb Thin Mode)
 # ==============================================================================
-DB_USER = "your_oracle_user"
-DB_PASSWORD = "your_oracle_password"
-DB_DSN = "your-oracle-hostname:1521/your_service_name"
+DB_USER = "k2"
+DB_PASSWORD = "k2"
+DB_DSN = "localhost:1521/jla12c"
